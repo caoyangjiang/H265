@@ -335,8 +335,8 @@ Void TEncSearch::init(TEncCfg*      pcEncCfg,
 }
 
 #define TZ_SEARCH_CONFIGURATION                                                                                 \
-const Int  iRaster                  = 5;  /* TZ soll von aussen ?ergeben werden */                            \
-const Bool bTestOtherPredictedMV    = 0;                                                                      \
+const Int  iRaster                  = 3;  /* TZ soll von aussen ?ergeben werden */                            \
+const Bool bTestOtherPredictedMV    = 1;                                                                      \
 const Bool bTestZeroVector          = 1;                                                                      \
 const Bool bTestZeroVectorStart     = 0;                                                                      \
 const Bool bTestZeroVectorStop      = 0;                                                                      \
@@ -4008,7 +4008,7 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU*   pcCU,
   const Bool bFirstSearchStop         = 0;  
   const UInt uiFirstSearchRounds      = 3;  
   const Bool bEnableRasterSearch      = 1;  
-  const Int  iRaster                  = 3;  
+  static Int  iRaster                  = 3;  
 
   const Bool bStarRefinementEnable    = 1;
   const Bool bAlwaysRasterSearch      = 0; /*0*/ /* ===== 1: BETTER but factor 2 slower ===== */                     \
@@ -4084,6 +4084,9 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU*   pcCU,
   //-------------------------------------------------------------------------------------------------------//
   if ((bEnableRasterSearch && ((Int)(cStruct.uiBestDistance) > iRaster)) )
   {   
+    if(iRaster <=4)
+      iRaster +=1;
+
     if(m_pcHostGPU->GetPUWidth() > 4 && m_pcHostGPU->GetPUHeight() > 4)
     {
       m_pcHostGPU->SetSearchWindowSize(pcMvSrchRngLT->getHor(),pcMvSrchRngRB->getHor(),pcMvSrchRngLT->getVer(),pcMvSrchRngRB->getVer());
@@ -4155,9 +4158,12 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU*   pcCU,
       // write out best match
       rcMv.set( cStruct.iBestX, cStruct.iBestY );
       ruiSAD = cStruct.uiBestSad - m_pcRdCost->getCost( cStruct.iBestX, cStruct.iBestY );
+   }
   }
-  // else {printf("Skipped\n");}
- }
+   else {    
+      if (iRaster >=2)
+        iRaster -=1;
+  }
 }
 
 Void TEncSearch::xPatternSearch( TComPattern* pcPatternKey, Pel* piRefY, Int iRefStride, TComMv* pcMvSrchRngLT, TComMv* pcMvSrchRngRB, TComMv& rcMv, Distortion& ruiSAD )

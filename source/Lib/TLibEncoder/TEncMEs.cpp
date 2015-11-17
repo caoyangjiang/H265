@@ -8,7 +8,7 @@
 void GpuMeDataAccess::Init() {
 	Pel* pTmp;
 
-	for(Int i=0; i < m_iGOPSize+1; i++)
+	for(Int i=0; i < MAX_NUM_REF; i++)
 	{
 		GPU::MemOpt::AllocDeviceMem<Pel*>(pTmp,sizeof(Pel) * GetLPadSize());
 		m_cYList.push_back(pTmp);
@@ -21,7 +21,7 @@ void GpuMeDataAccess::Init() {
 
 	}
 	
-	for(Int i=0; i < m_iGOPSize+1; i++)
+	for(Int i=0; i < MAX_NUM_REF; i++)
 	{
 		GPU::MemOpt::AllocDeviceMem<Pel*>(pTmp,sizeof(Pel) * GetLPadSize());
 		m_cYRefList0.push_back(pTmp);
@@ -33,7 +33,7 @@ void GpuMeDataAccess::Init() {
 		m_cVRefList0.push_back(pTmp);
 	}
 
-	for(Int i=0; i < m_iGOPSize+1; i++)
+	for(Int i=0; i < MAX_NUM_REF; i++)
 	{
 		GPU::MemOpt::AllocDeviceMem<Pel*>(pTmp,sizeof(Pel) * GetLPadSize());
 		m_cYRefList1.push_back(pTmp);
@@ -57,7 +57,7 @@ void GpuMeDataAccess::Init() {
 }
 
 void GpuMeDataAccess::Destroy() {
-	for (Int i=0; i < m_iGOPSize+1; i++) {
+	for (Int i=0; i < MAX_NUM_REF; i++) {
 		GPU::MemOpt::FreeDeviceMem<Pel>(m_cYList[i]);
 		GPU::MemOpt::FreeDeviceMem<Pel>(m_cUList[i]);
 		GPU::MemOpt::FreeDeviceMem<Pel>(m_cVList[i]);

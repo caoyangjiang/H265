@@ -1,0 +1,9 @@
+objects/TAppComCamPara.d.o: \
+ /home/caoyang/Desktop/H265/build/linux/lib/TAppCommon/../../../../source/Lib/TAppCommon/TAppComCamPara.cpp \
+ /home/caoyang/Desktop/H265/build/linux/lib/TAppCommon/../../../../source/Lib/TAppCommon/TAppComCamPara.h \
+ /home/caoyang/Desktop/H265/build/linux/lib/TAppCommon/../../../../source/Lib/TAppCommon/../../Lib/TLibCommon/CommonDef.h \
+ /home/caoyang/Desktop/H265/build/linux/lib/TAppCommon/../../../../source/Lib/TAppCommon/../../Lib/TLibCommon/TypeDef.h
+ /home/caoyang/Desktop/H265/build/linux/lib/TAppCommon/../../../../source/Lib/TAppCommon/TAppComCamPara.cpp :
+ /home/caoyang/Desktop/H265/build/linux/lib/TAppCommon/../../../../source/Lib/TAppCommon/TAppComCamPara.h :
+ /home/caoyang/Desktop/H265/build/linux/lib/TAppCommon/../../../../source/Lib/TAppCommon/../../Lib/TLibCommon/CommonDef.h :
+ /home/caoyang/Desktop/H265/build/linux/lib/TAppCommon/../../../../source/Lib/TAppCommon/../../Lib/TLibCommon/TypeDef.h :

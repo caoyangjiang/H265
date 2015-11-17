@@ -1610,7 +1610,7 @@ Void TEncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, TComList<TComPic*>& rc
         pTmp[0] = pcPic->getSlice(0)->getRefPic(REF_PIC_LIST_0,idx)->getPicYuvRec()->getBuf(COMPONENT_Y);
         pTmp[1] = pcPic->getSlice(0)->getRefPic(REF_PIC_LIST_0,idx)->getPicYuvRec()->getBuf(COMPONENT_Cb);
         pTmp[2] = pcPic->getSlice(0)->getRefPic(REF_PIC_LIST_0,idx)->getPicYuvRec()->getBuf(COMPONENT_Cr);
-        pcSearch->m_pcHostGPU->CopyRefFrameToGpuByIndex(pTmp, idx, 0);
+        pcSearch->m_pcHostGPU->CopyRefFrameToGpuByIndex(pTmp, idx, REF_PIC_LIST_0);
       }
       
 
@@ -1619,7 +1619,7 @@ Void TEncGOP::compressGOP( Int iPOCLast, Int iNumPicRcvd, TComList<TComPic*>& rc
         pTmp[0] = pcPic->getSlice(0)->getRefPic(REF_PIC_LIST_1,idx)->getPicYuvRec()->getBuf(COMPONENT_Y);
         pTmp[1] = pcPic->getSlice(0)->getRefPic(REF_PIC_LIST_1,idx)->getPicYuvRec()->getBuf(COMPONENT_Cb);
         pTmp[2] = pcPic->getSlice(0)->getRefPic(REF_PIC_LIST_1,idx)->getPicYuvRec()->getBuf(COMPONENT_Cr);
-        pcSearch->m_pcHostGPU->CopyRefFrameToGpuByIndex(pTmp, idx, 1);
+        pcSearch->m_pcHostGPU->CopyRefFrameToGpuByIndex(pTmp, idx, REF_PIC_LIST_1);
       }
 
       for(UInt nextCtuTsAddr = 0; nextCtuTsAddr < numberOfCtusInFrame; )

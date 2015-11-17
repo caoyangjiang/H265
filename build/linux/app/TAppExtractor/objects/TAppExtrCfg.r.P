@@ -1,0 +1,13 @@
+objects/TAppExtrCfg.r.o: \
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/TAppExtrCfg.cpp \
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/TAppExtrCfg.h \
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/../../Lib/TLibCommon/CommonDef.h \
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/../../Lib/TLibCommon/TypeDef.h \
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/../../Lib/TAppCommon/program_options_lite.h \
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/../../Lib/TAppCommon/../TLibCommon/CommonDef.h
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/TAppExtrCfg.cpp :
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/TAppExtrCfg.h :
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/../../Lib/TLibCommon/CommonDef.h :
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/../../Lib/TLibCommon/TypeDef.h :
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/../../Lib/TAppCommon/program_options_lite.h :
+ /home/caoyang/Desktop/H265/build/linux/app/TAppExtractor/../../../../source/App/TAppExtractor/../../Lib/TAppCommon/../TLibCommon/CommonDef.h :
