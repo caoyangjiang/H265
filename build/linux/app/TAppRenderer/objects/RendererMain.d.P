@@ -1,7 +1,0 @@
-objects/RendererMain.d.o: \
- /home/caoyang/Desktop/H265/build/linux/app/TAppRenderer/../../../../source/App/TAppRenderer/RendererMain.cpp \
- /home/caoyang/Desktop/H265/build/linux/app/TAppRenderer/../../../../source/App/TAppRenderer/../../Lib/TLibCommon/CommonDef.h \
- /home/caoyang/Desktop/H265/build/linux/app/TAppRenderer/../../../../source/App/TAppRenderer/../../Lib/TLibCommon/TypeDef.h
- /home/caoyang/Desktop/H265/build/linux/app/TAppRenderer/../../../../source/App/TAppRenderer/RendererMain.cpp :
- /home/caoyang/Desktop/H265/build/linux/app/TAppRenderer/../../../../source/App/TAppRenderer/../../Lib/TLibCommon/CommonDef.h :
- /home/caoyang/Desktop/H265/build/linux/app/TAppRenderer/../../../../source/App/TAppRenderer/../../Lib/TLibCommon/TypeDef.h :
