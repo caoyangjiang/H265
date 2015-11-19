@@ -229,7 +229,7 @@ void GpuMeDataAccess::PostKernelProcessing() {
 	}
 
 }
-
+/*
 Int GpuMeDataAccess::GetFrameWidth() const {
 	return m_iFrameWidth;
 }
@@ -342,3 +342,4 @@ UInt* GpuMeDataAccess::GetSadArray() const {
 	return m_puiSadArray;  
 }
 
+*/

@@ -3909,11 +3909,11 @@ Void TEncSearch::xMotionEstimation( TComDataCU* pcCU, TComYuv* pcYuvOrg, Int iPa
     }
 
     m_pcHostGPU->PreparePU(iPUOffset,iRoiWidth,iRoiHeight, eRefPicList == REF_PIC_LIST_0 ? 0 : 1, iRefIdxPred, m_pcRdCost->getMvPred().getHor(), m_pcRdCost->getMvPred().getVer(), m_pcRdCost->getCost(), m_pcRdCost->getCostScale());
-    
+    //printf("%d %d\n",iRoiWidth,iRoiHeight);
    // clock_t lBefore = clock();
     switch (m_iFastSearch) {
       rcMv = *pcMvPred;
-     
+
       case 3:
             xBlockFastSearch  ( pcCU, pcPatternKey, piRefY, iRefStride, &cMvSrchRngLT, &cMvSrchRngRB, rcMv, ruiCost );
             break;
@@ -3925,6 +3925,8 @@ Void TEncSearch::xMotionEstimation( TComDataCU* pcCU, TComYuv* pcYuvOrg, Int iPa
   else
   {
     rcMv = *pcMvPred;
+    //printf("%d %d\n",iRoiWidth,iRoiHeight);
+
     const TComMv *pIntegerMv2Nx2NPred=0;
     if (pcCU->getPartitionSize(0) != SIZE_2Nx2N || pcCU->getDepth(0) != 0)
     {
@@ -4084,9 +4086,9 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU*   pcCU,
   //-------------------------------------------------------------------------------------------------------//
   if ((bEnableRasterSearch && ((Int)(cStruct.uiBestDistance) > iRaster)) )
   {   
-    if(iRaster <=4)
-      iRaster +=1;
-
+    //if(iRaster <=4)
+    //  iRaster +=1;
+    
     if(m_pcHostGPU->GetPUWidth() > 4 && m_pcHostGPU->GetPUHeight() > 4)
     {
       m_pcHostGPU->SetSearchWindowSize(pcMvSrchRngLT->getHor(),pcMvSrchRngRB->getHor(),pcMvSrchRngLT->getVer(),pcMvSrchRngRB->getVer());
@@ -4161,8 +4163,8 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU*   pcCU,
    }
   }
    else {    
-      if (iRaster >=2)
-        iRaster -=1;
+     // if (iRaster >=2)
+     //   iRaster -=1;
   }
 }
 

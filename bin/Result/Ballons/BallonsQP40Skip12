@@ -1,0 +1,141 @@
+
+3D-HTM Software: Encoder Version [15.1] based on HM Version [16.6][Linux][GCC 4.8.3][64 bit] 
+
+
+Input File 0                     : /research/cjiang/VideoSequence/Multiview/Balloons/balloons1.yuv
+Input File 1                     : /research/cjiang/VideoSequence/Multiview/Balloons/balloons2.yuv
+Bitstream      File               : /research/cjiang/Bitstream/Bitstream.bit
+Reconstruction File 0            : /research/cjiang/Recon/rec_1.yuv
+Reconstruction File 1            : /research/cjiang/Recon/rec_2.yuv
+NuhLayerId                        : 0 1
+ViewIdVal                         : 1 0
+ViewOrderIdx                      : 0 1
+AuxId                             : 0 0
+QP                                : 40.00 40.00
+LoopFilterDisable                 : 0 0
+SAO                               : 1 1
+Real     Format                   : 1024x768 30Hz
+Internal Format                   : 1024x768 30Hz
+Sequence PSNR output              : Linear average only
+Sequence MSE output               : Disabled
+Frame MSE output                  : Disabled
+Cabac-zero-word-padding           : Enabled
+Frame/Field                       : Frame based coding
+Frame index                       : 0 - 8 (9 frames)
+Profile                           : main  main  multiview-main 
+CU size / depth / total-depth     : 64 / 4 / 4
+RQT trans. size (min / max)       : 4 / 32
+Max RQT depth inter               : 3
+Max RQT depth intra               : 3
+Min PCM size                      : 8
+Motion search range               : 64
+Disp search range restriction     : 0
+Vertical disp search range        : 56
+Intra period                      : 24 24
+Decoding refresh type             : 1
+Max dQP signaling depth           : 0
+Cb QP Offset                      : 0
+Cr QP Offset                      : 0
+QP adaptation                     : 0 (range=0)
+GOP size                          : 8
+Input bit depth                   : (Y:8, C:8)
+MSB-extended bit depth            : (Y:8, C:8)
+Internal bit depth                : (Y:8, C:8)
+PCM sample bit depth              : (Y:8, C:8)
+Intra reference smoothing         : Enabled
+diff_cu_chroma_qp_offset_depth         : -1
+extended_precision_processing_flag     : Disabled
+implicit_rdpcm_enabled_flag            : Disabled
+explicit_rdpcm_enabled_flag            : Disabled
+transform_skip_rotation_enabled_flag   : Disabled
+transform_skip_context_enabled_flag    : Disabled
+cross_component_prediction_enabled_flag: Disabled
+high_precision_offsets_enabled_flag    : Disabled
+persistent_rice_adaptation_enabled_flag: Disabled
+cabac_bypass_alignment_enabled_flag    : Disabled
+Sao Luma Offset bit shifts        : 0 0
+Sao Chroma Offset bit shifts      : 0 0
+Cost function:                    : Lossy coding (default)
+RateControl                       : 0
+Max Num Merge Candidates          : 5
+
+TOOL CFG General: IBD:0 HAD:0 RDQ:1 RDQTS:1 RDpenalty:0 SQP:0 ASR:0 FEN:0 ECU:0 FDM:0 CFM:0 ESD:0 RQT:1 TransformSkip:1 TransformSkipFast:1 TransformSkipLog2MaxSize:2 Slice: M=0 SliceSegment: M=0 CIP:0 PCM:0 TransQuantBypassEnabled:0 WPP:0 WPB:0 PME:2  WaveFrontSynchro:0 WaveFrontSubstreams:1 ScalingList:0 TMVPMode:1 AQpS:0 SignBitHidingFlag:1 RecalQP:0
+
+Non-environment-variable-controlled macros set as follows: 
+
+                                RExt__DECODER_DEBUG_BIT_STATISTICS =   0
+                                      RExt__HIGH_BIT_DEPTH_SUPPORT =   0
+                            RExt__HIGH_PRECISION_FORWARD_TRANSFORM =   0
+                                        O0043_BEST_EFFORT_DECODING =   0
+
+                   Input ChromaFormatIDC =   4:2:0
+Layer 0         Internal ChromaFormatIDC =   4:2:0
+Layer 1         Internal ChromaFormatIDC =   4:2:0
+
+
+Layer   0   POC    0 TId: 0 ( I-SLICE, nQP 40 QP 40 )      66216  bits [Y  36.0321 dB    U  39.8675 dB    V  38.9748 dB] [ET     1 ] [L0 ] [L1 ]
+Layer   1   POC    0 TId: 0 ( P-SLICE, nQP 40 QP 40 )      19408  bits [Y  35.8496 dB    U  39.2173 dB    V  38.9529 dB] [ET     4 ] [L0 V0 ] [L1 ]
+Layer   0   POC    8 TId: 0 ( B-SLICE, nQP 40 QP 40 )      13080  bits [Y  36.0922 dB    U  39.8716 dB    V  38.9914 dB] [ET     4 ] [L0 0 ] [L1 0 ]
+Layer   1   POC    8 TId: 0 ( B-SLICE, nQP 40 QP 40 )       9232  bits [Y  35.9632 dB    U  39.2770 dB    V  39.0038 dB] [ET     5 ] [L0 0 V0 ] [L1 0 V0 ]
+Layer   0   POC    4 TId: 0 ( B-SLICE, nQP 40 QP 40 )       1568  bits [Y  35.8626 dB    U  39.9075 dB    V  39.1017 dB] [ET     5 ] [L0 0 8 ] [L1 8 0 ]
+Layer   1   POC    4 TId: 0 ( B-SLICE, nQP 40 QP 40 )       1512  bits [Y  35.6498 dB    U  39.3422 dB    V  39.0439 dB] [ET     7 ] [L0 0 V0 8 ] [L1 8 0 V0 ]
+Layer   0   POC    2 TId: 0 ( B-SLICE, nQP 40 QP 40 )        544  bits [Y  35.9369 dB    U  39.8878 dB    V  39.0394 dB] [ET     5 ] [L0 0 4 ] [L1 4 8 ]
+Layer   1   POC    2 TId: 0 ( B-SLICE, nQP 40 QP 40 )        584  bits [Y  35.6666 dB    U  39.3159 dB    V  39.0385 dB] [ET     8 ] [L0 0 V0 4 ] [L1 4 8 0 ]
+Layer   0   POC    1 TId: 0 ( B-SLICE, nQP 40 QP 40 )        144  bits [Y  36.0020 dB    U  39.8788 dB    V  39.0154 dB] [ET     4 ] [L0 0 2 ] [L1 2 4 ]
+Layer   1   POC    1 TId: 0 ( B-SLICE, nQP 40 QP 40 )        120  bits [Y  35.7287 dB    U  39.2796 dB    V  38.9972 dB] [ET     8 ] [L0 0 V0 2 ] [L1 2 4 8 ]
+Layer   0   POC    3 TId: 0 ( B-SLICE, nQP 40 QP 40 )        176  bits [Y  35.8139 dB    U  39.8840 dB    V  39.0557 dB] [ET     5 ] [L0 2 0 ] [L1 4 8 ]
+Layer   1   POC    3 TId: 0 ( B-SLICE, nQP 40 QP 40 )        104  bits [Y  35.5201 dB    U  39.3145 dB    V  39.0246 dB] [ET     8 ] [L0 2 0 V0 ] [L1 4 8 2 ]
+Layer   0   POC    6 TId: 0 ( B-SLICE, nQP 40 QP 40 )        624  bits [Y  35.9287 dB    U  39.9210 dB    V  39.0859 dB] [ET     5 ] [L0 4 2 ] [L1 8 4 ]
+Layer   1   POC    6 TId: 0 ( B-SLICE, nQP 40 QP 40 )        608  bits [Y  35.5892 dB    U  39.3443 dB    V  39.0385 dB] [ET     8 ] [L0 4 2 V0 ] [L1 8 4 2 ]
+Layer   0   POC    5 TId: 0 ( B-SLICE, nQP 40 QP 40 )        152  bits [Y  35.8355 dB    U  39.9360 dB    V  39.0975 dB] [ET     5 ] [L0 4 0 ] [L1 6 8 ]
+Layer   1   POC    5 TId: 0 ( B-SLICE, nQP 40 QP 40 )        104  bits [Y  35.4962 dB    U  39.3665 dB    V  39.0398 dB] [ET     8 ] [L0 4 0 V0 ] [L1 6 8 4 ]
+Layer   0   POC    7 TId: 0 ( B-SLICE, nQP 40 QP 40 )        112  bits [Y  35.9699 dB    U  39.9072 dB    V  39.0391 dB] [ET     4 ] [L0 6 4 ] [L1 8 6 ]
+Layer   1   POC    7 TId: 0 ( B-SLICE, nQP 40 QP 40 )        112  bits [Y  35.7234 dB    U  39.3551 dB    V  39.0057 dB] [ET     7 ] [L0 6 4 V0 ] [L1 8 6 4 ]
+
+
+SUMMARY -------------------------------------------- LayerId  0
+	Total Frames |   Bitrate     Y-PSNR    U-PSNR    V-PSNR    YUV-PSNR 
+	        9    a     275.3867   35.9415   39.8957   39.0446   36.8276
+
+
+I Slices--------------------------------------------------------
+	Total Frames |   Bitrate     Y-PSNR    U-PSNR    V-PSNR    YUV-PSNR 
+	        1    i    1986.4800   36.0321   39.8675   38.9748   36.8928
+
+
+P Slices--------------------------------------------------------
+	Total Frames |   Bitrate     Y-PSNR    U-PSNR    V-PSNR    YUV-PSNR 
+	        0    p         -nan      -nan      -nan      -nan      -nan
+
+
+B Slices--------------------------------------------------------
+	Total Frames |   Bitrate     Y-PSNR    U-PSNR    V-PSNR    YUV-PSNR 
+	        8    b      61.5000   35.9302   39.8992   39.0533   36.8196
+
+RVM: 0.000
+
+
+SUMMARY -------------------------------------------- LayerId  1
+	Total Frames |   Bitrate     Y-PSNR    U-PSNR    V-PSNR    YUV-PSNR 
+	        9    a     105.9467   35.6874   39.3125   39.0161   36.5662
+
+
+I Slices--------------------------------------------------------
+	Total Frames |   Bitrate     Y-PSNR    U-PSNR    V-PSNR    YUV-PSNR 
+	        0    i         -nan      -nan      -nan      -nan      -nan
+
+
+P Slices--------------------------------------------------------
+	Total Frames |   Bitrate     Y-PSNR    U-PSNR    V-PSNR    YUV-PSNR 
+	        1    p     582.2400   35.8496   39.2173   38.9529   36.6851
+
+
+B Slices--------------------------------------------------------
+	Total Frames |   Bitrate     Y-PSNR    U-PSNR    V-PSNR    YUV-PSNR 
+	        8    b      46.4100   35.6671   39.3244   39.0240   36.5516
+
+RVM: 0.000
+
+Bytes written to file: 14390 (383.733 kbps)
+
+ Total Time:      102.180 sec.

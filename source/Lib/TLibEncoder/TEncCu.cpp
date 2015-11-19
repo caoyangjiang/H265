@@ -775,8 +775,17 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
   {
     iMaxQP = iMinQP; // If all TUs are forced into using transquant bypass, do not loop here.
   }
+
+  //JCY: QP constrained depth selection
+  assert(iMaxQP==iMinQP);
+  UInt uiControlledDepth = sps.getLog2MinCodingBlockSize();
+
+  //UInt uiControlledDepth = DepthLUT[iMaxQP];
+  //uiControlledDepth = uiControlledDepth > sps.getLog2MinCodingBlockSize() ? sps.getLog2MinCodingBlockSize() : uiControlledDepth;
+  //uiControlledDepth = rpcBestCU->getSlice()->getSliceType() == I_SLICE ? sps.getLog2MinCodingBlockSize() : uiControlledDepth;
+  
   const Bool bSubBranch = bBoundary || !( m_pcEncCfg->getUseEarlyCU() && rpcBestCU->getTotalCost()!=MAX_DOUBLE && rpcBestCU->isSkipped(0) );
-  if( bSubBranch && uiDepth < sps.getLog2DiffMaxMinCodingBlockSize() && (!getFastDeltaQp() || uiWidth > fastDeltaQPCuMaxSize || bBoundary))
+  if( bSubBranch && uiDepth < uiControlledDepth && (!getFastDeltaQp() || uiWidth > fastDeltaQPCuMaxSize || bBoundary))
   {
     // further split
     for (Int iQP=iMinQP; iQP<=iMaxQP; iQP++)
@@ -808,6 +817,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
 
 #if AMP_ENC_SPEEDUP
           DEBUG_STRING_NEW(sChild)
+
           if ( !(rpcBestCU->getTotalCost()!=MAX_DOUBLE && rpcBestCU->isInter(0)) )
           {
             xCompressCU( pcSubBestPartCU, pcSubTempPartCU, uhNextDepth DEBUG_STRING_PASS_INTO(sChild), NUMBER_OF_PART_SIZES );
@@ -817,6 +827,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
 
             xCompressCU( pcSubBestPartCU, pcSubTempPartCU, uhNextDepth DEBUG_STRING_PASS_INTO(sChild), rpcBestCU->getPartitionSize(0) );
           }
+          
           DEBUG_STRING_APPEND(sTempDebug, sChild)
 #else
           xCompressCU( pcSubBestPartCU, pcSubTempPartCU, uhNextDepth );

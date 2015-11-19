@@ -40,7 +40,119 @@ public:
 	void SetKernelParameter();
 	void PostKernelProcessing();
 
+	inline Int GetFrameWidth() const {
+		return m_iFrameWidth;
+	}
 
+	inline Int GetFrameHeight() const {
+		return m_iFrameHeight;
+	}
+
+	inline Int GetLPadSize() const { 
+		return (m_iFrameWidth + 2*m_iPadlen) * (m_iFrameHeight + 2*m_iPadlen);
+	}
+
+	inline Int GetCPadSize() const { 
+		return (m_iFrameWidth/2 + 2*m_iPadlen/2) * (m_iFrameHeight/2 + 2*m_iPadlen/2);
+	}
+
+	inline Int GetLStride() const {
+		return m_iFrameWidth + 2*m_iPadlen;
+	}
+
+	inline Int GetCStride() const {
+		return m_iFrameWidth/2 + 2*m_iPadlen/2;
+	}
+
+	inline Int GetLOrgOffset() const {
+		return m_iPadlen   * GetLStride() + m_iPadlen;
+	}
+
+	inline Int GetCOrgOffset() const {
+		return m_iPadlen/2 * GetCStride() + m_iPadlen/2;
+	}
+
+	inline Int GetPUWidth() const {
+		return m_iPUWidth;
+	}
+
+	inline Int GetPUHeight() const {
+		return m_iPUHeight;
+	}
+
+	inline Int GetMvX() const {
+		return m_iMvX;
+	}
+
+	inline Int GetMvY() const {
+		return m_iMvY;
+	}
+
+	inline UInt GetSad() const {
+		return m_uiSad;
+	}
+
+	inline Int GetLx() const {
+		return m_ilx;
+	}
+
+	inline Int GetRx() const {
+		return m_irx;
+	}
+
+	inline Int GetTy() const {
+		return m_ity;
+	}
+
+	inline Int GetBy() const {
+		return m_iby;
+
+	}
+
+	inline Int GetSearchRange() const {
+		return m_iSearchRange;
+	}
+
+	inline UInt GetCost() const {
+		return m_uiCost;
+	}
+
+	inline Int GetCostScale() const {
+		return m_iCostScale;
+	}
+
+	inline Int GetMvPredX() const {
+		return m_iMvPredx;
+	}
+
+	inline Int GetMvPredY() const {
+		return m_iMvPredy;
+	}
+
+	inline Int GetNumThreads() const {
+		return m_iNumThreads;
+	}
+
+	inline Int GetNumBlocks() const {
+		return m_iNumBlocks;
+	}
+
+	inline Int GetSharedMemSize() const {
+		return m_iSharedMemSize;
+	}
+
+	inline const Pel* GetYRefPU() const {
+		return m_pYRefPU;
+	}	
+	inline const Pel* GetYOrgPU() const {
+		return m_pYOrgPU;
+	}
+
+	inline UInt* GetSadArray() const {
+		return m_puiSadArray;  
+	}
+
+/*
 	Int GetFrameWidth() const;
 	Int GetFrameHeight() const;
 	
@@ -74,7 +186,7 @@ public:
 	const Pel*  GetYOrgPU() const; 	
 	
 	UInt*  GetSadArray() const;
-
+*/
 private:
 
 	Int m_iPUWidth;
