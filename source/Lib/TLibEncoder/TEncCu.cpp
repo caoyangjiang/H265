@@ -912,13 +912,56 @@ Void TEncCu::xCompressCU(TComDataCU*& rpcBestCU,
 
   //! Local LUT
   static const UInt* pIncDepthLUT;
-  static Int iLUTBaseQP;
-  static bool isLUTSet = false;
-  if (isLUTSet == false)
+  // static const UInt** ppIncDepthLUT;
+  static Int iLUTBaseQP[8];  // reservered for eight view
+  // static bool isLUTSet = false;
+  const Int iViewId = pcPic->getViewId();
+  // if (rpcBestCU->getSlice()->getSliceType() == I_SLICE)
+  // {
+  //   ppIncDepthLUT = IncDepthLUT[0];
+  // }
+  // else if (rpcBestCU->getSlice()->getSliceType() == P_SLICE)
+  // {
+  //   ppIncDepthLUT = IncDepthLUT[1];
+  // }
+
+  if ((rpcBestCU->getSlice()->getSliceType() == I_SLICE) ||
+      (rpcBestCU->getSlice()->getSliceType() == P_SLICE))
+  {
+    iLUTBaseQP[iViewId] = iMaxQP;
+  }
+
+  if (iLUTBaseQP[iViewId] < 21)
+    pIncDepthLUT = IncDepthLUT[0];
+  else if (iLUTBaseQP[iViewId] >= 21 && iLUTBaseQP[iViewId] < 27)
+    pIncDepthLUT = IncDepthLUT[1];
+  else if (iLUTBaseQP[iViewId] >= 27 && iLUTBaseQP[iViewId] < 33)
+    pIncDepthLUT = IncDepthLUT[2];
+  else
+    pIncDepthLUT = IncDepthLUT[3];
+
+  if ((iMaxQP - iLUTBaseQP[iViewId]) >= pIncDepthLUT[3])
+  {
+    uiControlledDepth = 0;
+  }
+  else
+  {
+    for (int i = 2; i >= 0; i--)
+    {
+      if ((iMaxQP - iLUTBaseQP[iViewId]) >= pIncDepthLUT[i])
+      {
+        uiControlledDepth = 3 - i;
+        break;
+      }
+    }
+  }
+
+  /*
+  if (isLUTSet == false || PrevViewId != pcPic->getViewId())
   {
     iLUTBaseQP = iMaxQP;
 
-    if (iLUTBaseQP < 21)
+    if (iLUTBaseQP[pcPic->getViewId()] < 21)
       pIncDepthLUT = IncDepthLUT[0];
     else if (iLUTBaseQP >= 21 && iLUTBaseQP < 27)
       pIncDepthLUT = IncDepthLUT[1];
@@ -929,6 +972,7 @@ Void TEncCu::xCompressCU(TComDataCU*& rpcBestCU,
 
     isLUTSet = true;
   }
+
 
   if ((iMaxQP - iLUTBaseQP) >= pIncDepthLUT[3])
   {
@@ -945,13 +989,14 @@ Void TEncCu::xCompressCU(TComDataCU*& rpcBestCU,
       }
     }
   }
+  */
 
-  //! Exceptions
   uiControlledDepth = uiControlledDepth > sps.getLog2MinCodingBlockSize()
                           ? sps.getLog2MinCodingBlockSize()
                           : uiControlledDepth;
-  uiControlledDepth = (rpcBestCU->getSlice()->getSliceType() == I_SLICE) ||
-                              (rpcBestCU->getSlice()->getSliceType() == P_SLICE)
+  //! Exceptions
+  uiControlledDepth = ((rpcBestCU->getSlice()->getSliceType() == I_SLICE) ||
+                       (rpcBestCU->getSlice()->getSliceType() == P_SLICE))
                           ? sps.getLog2MinCodingBlockSize()
                           : uiControlledDepth;
 
