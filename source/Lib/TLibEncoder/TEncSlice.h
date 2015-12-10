@@ -37,7 +37,10 @@
 
 #ifndef __TENCSLICE__
 #define __TENCSLICE__
-
+#include <thread>
+#include <condition_variable>
+#include <mutex>
+#include <pthread.h>
 // Include files
 #include "TLibCommon/CommonDef.h"
 #include "TLibCommon/TComList.h"
@@ -58,87 +61,304 @@ class TEncGOP;
 // ====================================================================================================================
 
 /// slice encoder class
-class TEncSlice
-  : public WeightPredAnalysis
+
+class WPPScheduler
 {
-private:
+ public:
+  WPPScheduler()
+      : m_ctuStatus(NULL)
+      , m_uiCtuInRow(0)
+      , m_uiCtuInColumn(0)
+      , m_pWppOrderIndex(NULL)
+
+  {
+  }
+
+  // WPPScheduler(int uiCtuInRow, int uiCtuInColumn)
+  //     : m_uiCtuInRow(uiCtuInRow), m_uiCtuInColumn(uiCtuInColumn)
+  // {
+  //   m_pWppOrderIndex = new int[uiCtuInRow * uiCtuInColumn];
+  //   m_ctuStatus      = new int[uiCtuInRow * uiCtuInColumn];
+  // }
+
+  void SetWPPScheduler(int uiCtuInRow, int uiCtuInColumn)
+  {
+    m_uiCtuInRow    = uiCtuInRow;
+    m_uiCtuInColumn = uiCtuInColumn;
+
+    if (m_pWppOrderIndex == NULL)
+      m_pWppOrderIndex = new int[uiCtuInRow * uiCtuInColumn];
+
+    if (m_ctuStatus == NULL) m_ctuStatus = new int[uiCtuInRow * uiCtuInColumn];
+  }
+
+  ~WPPScheduler()
+  {
+    if (m_pWppOrderIndex != NULL) delete m_pWppOrderIndex;
+
+    if (m_ctuStatus != NULL) delete m_ctuStatus;
+  }
+
+  void CalculateWppCtuAddress()
+  {
+    int uiCtuWFAddress = 0;
+    int uiDiagStartX   = 0;
+    int uiDiagStartY   = 0;
+    int uiCtuInRow     = m_uiCtuInRow;
+    int uiCtuInColumn  = m_uiCtuInColumn;
+    int uiCtuAddress;
+    int uiCtuY, uiCtuX;
+    int TotalCtu = uiCtuInRow * uiCtuInColumn;
+
+    for (uiCtuAddress = 0; uiCtuAddress < TotalCtu; uiCtuAddress++)
+    {
+      uiCtuY = uiCtuWFAddress / uiCtuInRow;
+      uiCtuX = uiCtuWFAddress % uiCtuInRow;
+
+      m_pWppOrderIndex[uiCtuAddress] = uiCtuWFAddress;
+
+      if (uiCtuX != 0 && uiCtuY != (uiCtuInColumn - 1) &&
+          uiDiagStartX !=
+              (uiCtuInRow -
+               1))  // 30 is a magic nuCtuer to be replaced by uiCtuInColumn
+      {
+        if ((uiCtuWFAddress + uiCtuInRow - 2) <
+            (uiCtuWFAddress / uiCtuInRow + 1) * uiCtuInRow)
+        {
+          uiDiagStartX++;
+          uiCtuWFAddress = uiDiagStartX + uiDiagStartY * uiCtuInRow;
+        }
+        else
+        {
+          uiCtuWFAddress = uiCtuWFAddress + (uiCtuInRow - 2);
+        }
+      }
+      else
+      {
+        if (uiDiagStartX > (uiCtuInRow - 1) ||
+            uiDiagStartY > (uiCtuInColumn - 1))
+          printf("Wave front overflow!");
+
+        if (uiDiagStartX != uiCtuInRow - 1)
+        {
+          uiDiagStartX += 1;
+        }
+        else
+        {
+          uiDiagStartX -= 2;
+          uiDiagStartY += 1;
+        }
+
+        uiCtuWFAddress = uiDiagStartX + uiDiagStartY * uiCtuInRow;
+      }
+    }
+
+    m_pWppOrderIndex[uiCtuWFAddress] = uiCtuWFAddress;
+  }
+
+  void printWppIndex() const
+  {
+    printf("\n");
+    for (int i = 0; i < m_uiCtuInRow * m_uiCtuInColumn; i++)
+      printf("%d,", m_pWppOrderIndex[i]);
+    printf("\n");
+  }
+
+  int getWppIndex(int RasterScanOrderIndex) const
+  {
+    return m_pWppOrderIndex[RasterScanOrderIndex];
+  }
+
+  int getCtuInRow() const
+  {
+    return m_uiCtuInRow;
+  }
+
+  int getCtuInColumn() const
+  {
+    return m_uiCtuInColumn;
+  }
+
+  void resetStatus()
+  {
+    memset(m_ctuStatus, 0, sizeof(int) * m_uiCtuInRow * m_uiCtuInColumn);
+  }
+
+ public:
+  int* m_ctuStatus;
+
+ private:
+  int m_uiCtuInRow;
+  int m_uiCtuInColumn;
+  int* m_pWppOrderIndex;
+};
+
+/// slice encoder class
+class TEncSlice : public WeightPredAnalysis
+{
+  // multi-threading
+ public:
+  typedef struct threadpool
+  {
+    // you should fill in this structure with whatever you need
+    int ctuIndex;
+    int num_threads;       // number of active threads
+    std::thread* threads;  // pointer to threads
+    std::mutex qlock;      // lock on the queue list
+    std::mutex cs;
+    std::condition_variable
+        q_not_empty;  // non empty and empty condidtion vairiables
+    int shutdown;
+    int dont_accept;
+  } threadpool;
+
+  threadpool m_threadpool;
+  WPPScheduler m_cWppScheduler;
+
+ private:
   // encoder configuration
-  TEncCfg*                m_pcCfg;                              ///< encoder configuration class
+  TEncCfg* m_pcCfg;  ///< encoder configuration class
 
   // pictures
-  TComList<TComPic*>*     m_pcListPic;                          ///< list of pictures
-  TComPicYuv*             m_apcPicYuvPred;                      ///< prediction picture buffer
-  TComPicYuv*             m_apcPicYuvResi;                      ///< residual picture buffer
+  TComList<TComPic*>* m_pcListPic;  ///< list of pictures
+  TComPicYuv* m_apcPicYuvPred;      ///< prediction picture buffer
+  TComPicYuv* m_apcPicYuvResi;      ///< residual picture buffer
 
   // processing units
-  TEncGOP*                m_pcGOPEncoder;                       ///< GOP encoder
-  TEncCu*                 m_pcCuEncoder;                        ///< CU encoder
-
+  TEncGOP* m_pcGOPEncoder;  ///< GOP encoder
+  TEncCu* m_pcCuEncoder;    ///< CU encoder
+  TEncCu* m_pcCuEncoderWPP;
   // encoder search
-  TEncSearch*             m_pcPredSearch;                       ///< encoder search class
+  TEncSearch* m_pcPredSearch;  ///< encoder search class
 
   // coding tools
-  TEncEntropy*            m_pcEntropyCoder;                     ///< entropy encoder
-  TEncSbac*               m_pcSbacCoder;                        ///< SBAC encoder
-  TEncBinCABAC*           m_pcBinCABAC;                         ///< Bin encoder CABAC
-  TComTrQuant*            m_pcTrQuant;                          ///< transform & quantization
+  TEncEntropy* m_pcEntropyCoder;  ///< entropy encoder
+  TEncSbac* m_pcSbacCoder;        ///< SBAC encoder
+  TEncBinCABAC* m_pcBinCABAC;     ///< Bin encoder CABAC
+  TComTrQuant* m_pcTrQuant;       ///< transform & quantization
 
   // RD optimization
-  TComRdCost*             m_pcRdCost;                           ///< RD cost computation
-  TEncSbac***             m_pppcRDSbacCoder;                    ///< storage for SBAC-based RD optimization
-  TEncSbac*               m_pcRDGoOnSbacCoder;                  ///< go-on SBAC encoder
-  UInt64                  m_uiPicTotalBits;                     ///< total bits for the picture
-  UInt64                  m_uiPicDist;                          ///< total distortion for the picture
-  Double                  m_dPicRdCost;                         ///< picture-level RD cost
-  Double*                 m_pdRdPicLambda;                      ///< array of lambda candidates
-  Double*                 m_pdRdPicQp;                          ///< array of picture QP candidates (double-type for lambda)
-  Int*                    m_piRdPicQp;                          ///< array of picture QP candidates (Int-type)
-  TEncRateCtrl*           m_pcRateCtrl;                         ///< Rate control manager
-  UInt                    m_uiSliceIdx;
-  TEncSbac                m_lastSliceSegmentEndContextState;    ///< context storage for state at the end of the previous slice-segment (used for dependent slices only).
-  TEncSbac                m_entropyCodingSyncContextState;      ///< context storate for state of contexts at the wavefront/WPP/entropy-coding-sync second CTU of tile-row
-  SliceType               m_encCABACTableIdx;
+  TComRdCost* m_pcRdCost;         ///< RD cost computation
+  TEncSbac*** m_pppcRDSbacCoder;  ///< storage for SBAC-based RD optimization
+  TEncSbac* m_pcRDGoOnSbacCoder;  ///< go-on SBAC encoder
+  UInt64 m_uiPicTotalBits;        ///< total bits for the picture
+  UInt64 m_uiPicDist;             ///< total distortion for the picture
+  Double m_dPicRdCost;            ///< picture-level RD cost
+  Double* m_pdRdPicLambda;        ///< array of lambda candidates
+  Double*
+      m_pdRdPicQp;  ///< array of picture QP candidates (double-type for lambda)
+  Int* m_piRdPicQp;            ///< array of picture QP candidates (Int-type)
+  TEncRateCtrl* m_pcRateCtrl;  ///< Rate control manager
+  UInt m_uiSliceIdx;
+  TEncSbac m_lastSliceSegmentEndContextState;  ///< context storage for state at
+  /// the end of the previous
+  /// slice-segment (used for
+  /// dependent slices only).
+  TEncSbac m_entropyCodingSyncContextState;  ///< context storate for state of
+  /// contexts at the
+  /// wavefront/WPP/entropy-coding-sync
+  /// second CTU of tile-row
+  SliceType m_encCABACTableIdx;
 
-  Void     setUpLambda(TComSlice* slice, const Double dLambda, Int iQP);
-  Void     calculateBoundingCtuTsAddrForSlice(UInt &startCtuTSAddrSlice, UInt &boundingCtuTSAddrSlice, Bool &haveReachedTileBoundary, TComPic* pcPic, const Int sliceMode, const Int sliceArgument);
+  Void setUpLambda(TComSlice* slice, const Double dLambda, Int iQP);
+  Void calculateBoundingCtuTsAddrForSlice(UInt& startCtuTSAddrSlice,
+                                          UInt& boundingCtuTSAddrSlice,
+                                          Bool& haveReachedTileBoundary,
+                                          TComPic* pcPic,
+                                          const Int sliceMode,
+                                          const Int sliceArgument);
 
-public:
+ public:
   TEncSlice();
   virtual ~TEncSlice();
 
-  Void    create              ( Int iWidth, Int iHeight, ChromaFormat chromaFormat, UInt iMaxCUWidth, UInt iMaxCUHeight, UChar uhTotalDepth );
-  Void    destroy             ();
-  Void    init                ( TEncTop* pcEncTop );
+  void encodeCTUWPP(TComPic* pcPic,
+                    UInt ctuTsAddr,
+                    TComSlice* const pcSlice,
+                    const UInt frameWidthInCtus,
+                    UInt startCtuTsAddr,
+                    UInt boundingCtuTsAddr,
+                    TEncBinCABAC* pRDSbacCoder,
+                    TComBitCounter* tempBitCounter,
+                    Int ctu_row_id,
+                    Int ThreadId);
+  void threadTask(TComPic* pcPic,
+                  UInt ctuTsAddr,
+                  TComSlice* const pcSlice,
+                  const UInt frameWidthInCtus,
+                  UInt startCtuTsAddr,
+                  UInt boundingCtuTsAddr,
+                  TEncBinCABAC* pRDSbacCoder,
+                  TComBitCounter* tempBitCounter,
+                  Int threadid);
 
-  /// preparation of slice encoding (reference marking, QP and lambda)
+  Void create(Int iWidth,
+              Int iHeight,
+              ChromaFormat chromaFormat,
+              UInt iMaxCUWidth,
+              UInt iMaxCUHeight,
+              UChar uhTotalDepth);
+  Void destroy();
+  Void init(TEncTop* pcEncTop);
+
+/// preparation of slice encoding (reference marking, QP and lambda)
 #if NH_MV
-  Void    initEncSlice        ( TComPic* pcPic, Int pocLast, Int pocCurr, 
-                                Int iGOPid, TComSlice*& rpcSlice, TComVPS* pVPS, Int layerId, bool isField  ); 
+  Void initEncSlice(TComPic* pcPic,
+                    Int pocLast,
+                    Int pocCurr,
+                    Int iGOPid,
+                    TComSlice*& rpcSlice,
+                    TComVPS* pVPS,
+                    Int layerId,
+                    bool isField);
 #else
-  Void    initEncSlice        ( TComPic*  pcPic, Int pocLast, Int pocCurr, 
-                                Int iGOPid,   TComSlice*& rpcSlice, Bool isField );
+  Void initEncSlice(TComPic* pcPic,
+                    Int pocLast,
+                    Int pocCurr,
+                    Int iGOPid,
+                    TComSlice*& rpcSlice,
+                    Bool isField);
 #endif
-  Void    resetQP             ( TComPic* pic, Int sliceQP, Double lambda );
+  Void resetQP(TComPic* pic, Int sliceQP, Double lambda);
   // compress and encode slice
-  Void    precompressSlice    ( TComPic* pcPic                                     );      ///< precompress slice for multi-loop slice-level QP opt.
-  Void    compressSlice       ( TComPic* pcPic, const Bool bCompressEntireSlice, const Bool bFastDeltaQP );      ///< analysis stage of slice
-  Void    calCostSliceI       ( TComPic* pcPic );
-  Void    encodeSlice         ( TComPic* pcPic, TComOutputBitstream* pcSubstreams, UInt &numBinsCoded );
+  Void precompressSlice(TComPic* pcPic);  ///< precompress slice for multi-loop
+  /// slice-level QP opt.
+  Void compressSlice(TComPic* pcPic,
+                     const Bool bCompressEntireSlice,
+                     const Bool bFastDeltaQP);  ///< analysis stage of slice
+  Void calCostSliceI(TComPic* pcPic);
+  Void encodeSlice(TComPic* pcPic,
+                   TComOutputBitstream* pcSubstreams,
+                   UInt& numBinsCoded);
 
   // misc. functions
-  Void    setSearchRange      ( TComSlice* pcSlice  );                                  ///< set ME range adaptively
+  Void setSearchRange(TComSlice* pcSlice);  ///< set ME range adaptively
 
-  TEncCu*        getCUEncoder() { return m_pcCuEncoder; }                        ///< CU encoder
-  Void    xDetermineStartAndBoundingCtuTsAddr  ( UInt& startCtuTsAddr, UInt& boundingCtuTsAddr, TComPic* pcPic );
-  UInt    getSliceIdx()         { return m_uiSliceIdx;                    }
-  Void    setSliceIdx(UInt i)   { m_uiSliceIdx = i;                       }
+  TEncCu* getCUEncoder()
+  {
+    return m_pcCuEncoder;
+  }  ///< CU encoder
+  Void xDetermineStartAndBoundingCtuTsAddr(UInt& startCtuTsAddr,
+                                           UInt& boundingCtuTsAddr,
+                                           TComPic* pcPic);
+  UInt getSliceIdx()
+  {
+    return m_uiSliceIdx;
+  }
+  Void setSliceIdx(UInt i)
+  {
+    m_uiSliceIdx = i;
+  }
 
-  SliceType getEncCABACTableIdx() const           { return m_encCABACTableIdx;        }
+  SliceType getEncCABACTableIdx() const
+  {
+    return m_encCABACTableIdx;
+  }
 
-private:
-  Double  xGetQPValueAccordingToLambda ( Double lambda );
+ private:
+  Double xGetQPValueAccordingToLambda(Double lambda);
 };
 
 //! \}
 
-#endif // __TENCSLICE__
+#endif  // __TENCSLICE__

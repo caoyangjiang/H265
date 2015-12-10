@@ -259,6 +259,24 @@ Void TEncCu::init(TEncTop* pcEncTop)
   m_pcRateCtrl = pcEncTop->getRateCtrl();
 }
 
+Void TEncCu::initWPP(TEncTop* pcEncTop, Int i)
+{
+  m_pcEncCfg     = pcEncTop;
+  m_pcPredSearch = &pcEncTop->m_cSearchWPP[i];
+  m_pcTrQuant    = &pcEncTop->m_cTrQuantWPP[i];
+  m_pcRdCost     = &pcEncTop->m_cRdCostWPP[i];
+
+  m_pcEntropyCoder = pcEncTop->getEntropyCoder();  // m_cEntropyCoderWPP[i];
+  m_pcBinCABAC     = pcEncTop->getBinCABAC();  // m_cBinCABACWPP[i];
+
+  m_pppcRDSbacCoder =
+      pcEncTop->getRDSbacCoder();  // pcEncTop->m_pppcRDSbacCoderWPP[i];
+  m_pcRDGoOnSbacCoder =
+      pcEncTop->getRDGoOnSbacCoder();  //&pcEncTop->m_cRDGoOnSbacCoderWPP[i];
+
+  m_pcRateCtrl = pcEncTop->getRateCtrl();
+}
+
 // ====================================================================================================================
 // Public member functions
 // ====================================================================================================================

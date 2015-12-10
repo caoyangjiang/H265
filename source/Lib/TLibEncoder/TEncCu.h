@@ -87,8 +87,12 @@ const UInt DepthLUT[60] = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 // Ballons View0 {-0.1207dB, +2.8349%}
 // Ballons View1 {-0.3088dB, +7.5187%}
 // Ballons View2 {-0.3088db, +8.3443%}
+// const UInt IncDepthLUT[4][4]{
+//    {0, 4, 7, 9}, {0, 3, 5, 7}, {0, 2, 4, 7}, {0, 1, 1, 3}};
+
+//! Local #4
 const UInt IncDepthLUT[4][4]{
-    {0, 4, 7, 9}, {0, 3, 5, 7}, {0, 2, 4, 7}, {0, 1, 1, 3}};
+    {0, 4, 7, 9}, {0, 2, 6, 7}, {0, 2, 4, 7}, {0, 1, 2, 3}};
 
 // const UInt IncDepthLUT[2][4][4]{
 //    {{0, 4, 7, 9}, {0, 3, 5, 7}, {0, 2, 4, 7}, {0, 1, 1, 3}},    // Base
@@ -136,7 +140,11 @@ class TEncCu
  public:
   /// copy parameters from encoder class
   Void init(TEncTop* pcEncTop);
-
+  Void initWPP(TEncTop* pcEncTop, Int i);
+  TEncSearch* GetSearch() const
+  {
+    return m_pcPredSearch;
+  }
   /// create internal buffers
   Void create(UChar uhTotalDepth,
               UInt iMaxWidth,

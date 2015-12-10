@@ -70,6 +70,19 @@ namespace GPU
 {
 	namespace MemOpt
 	{
+
+		Int 
+		ChangeDevice(Int iDevice) {
+			Int deviceCount = 1;
+			Int setDevice;
+			cudaError_t status;
+
+			setDevice = iDevice % deviceCount;
+    		CUDART_CHECK( cudaGetDeviceCount(&deviceCount) );
+			CUDART_CHECK( cudaSetDevice(setDevice) );
+			return setDevice;
+		}
+
 		template<class T>
 		void
 		AllocDeviceMem(T& src, size_t len)
