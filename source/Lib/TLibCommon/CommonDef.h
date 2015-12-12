@@ -490,7 +490,7 @@ static const std::string NALU_TYPE_STR[] = {
     "UNSPECIFIED_61        ", "UNSPECIFIED_62        ",
     "UNSPECIFIED_63        ", "INVALID               "};
 #endif
-#define WPP_THREAD_NUM 4
+#define WPP_THREAD_NUM 12
 #define WPP_NUM_ROWS 25  // For height <= 1600
 #define NUM_GPU 1
 //! \}

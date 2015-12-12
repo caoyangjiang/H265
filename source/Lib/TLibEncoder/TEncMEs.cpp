@@ -274,7 +274,6 @@ void GpuMeDataAccess::GpuSearchWrapper()
    */
 
   GPU::MemOpt::ChangeDevice(m_iGpuId);
-
   SetKernelParameter();
   GPU::Kernel::gpuGpuFullBlockSearch(this);
   PostKernelProcessing();

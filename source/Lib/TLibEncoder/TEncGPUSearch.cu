@@ -1,4 +1,5 @@
 #include "TEncGPUSearch.h"
+#include "TLibCommon/CommonDef.h"
 #include "TEncMEs.h"
 #include <pthread.h>
 #include <math.h>
@@ -73,7 +74,7 @@ namespace GPU
 
 		Int 
 		ChangeDevice(Int iDevice) {
-			Int deviceCount = 1;
+			Int deviceCount = NUM_GPU;
 			Int setDevice;
 			cudaError_t status;
 
