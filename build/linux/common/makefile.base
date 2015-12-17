@@ -49,7 +49,7 @@ endif
 
 # default cpp flags for all configurations
 #CPPFLAGS          = -Wall -fPIC $(DEFS) -I$(CURDIR)/$(INC_DIR) $(USER_INC_DIRS)
-CPPFLAGS          = -fPIC $(DEFS)  $(ADDDEFS) -I$(CURDIR)/$(INC_DIR) $(USER_INC_DIRS) -Wall -Wshadow -Wno-sign-compare -Werror
+CPPFLAGS          = -fPIC $(DEFS)  $(ADDDEFS) -I$(CURDIR)/$(INC_DIR) $(USER_INC_DIRS) -std=c++11 -Wall -Wshadow -Wno-sign-compare -Werror
 CCFLAGS          =  -static-libgcc -fPIC $(DEFS) -I$(CURDIR)/$(INC_DIR) $(USER_INC_DIRS) -Wall -Wshadow -Wno-sign-compare -Werror
 NVCCFLAGS         = -I$(INC_DIR) -I$(INC_LIB) --compiler-options=-Wall -c -arch=compute_52 -code=sm_52 -Xptxas -dlcm=ca
 ########## 
@@ -227,14 +227,14 @@ define COMPILE_AND_DEPEND_DEBUG
                 rm -f $(OBJ_DIR)/$*.d.d
 endef
 define COMPILE_AND_DEPEND_RELEASE_C
-        $(CC) -c -MMD -MF $(OBJ_DIR)/$*.r.d -MT $(OBJ_DIR)/$*.r.o $(CPPFLAGS) $(RELEASE_CPPFLAGS) -o $@ $(CURDIR)/$<
+        $(CC) -c -MMD -MF $(OBJ_DIR)/$*.r.d -MT $(OBJ_DIR)/$*.r.o $(CCPFLAGS) $(RELEASE_CCPFLAGS) -o $@ $(CURDIR)/$<
         @cp $(OBJ_DIR)/$*.r.d $(OBJ_DIR)/$*.r.P; \
                 sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
                 -e '/^$$/ d' -e 's/$$/ :/' < $(OBJ_DIR)/$*.r.d >> $(OBJ_DIR)/$*.r.P; \
                 rm -f $(OBJ_DIR)/$*.r.d
 endef
 define COMPILE_AND_DEPEND_DEBUG_C
-        $(CC) -c -MMD -MF $(OBJ_DIR)/$*.d.d -MT $(OBJ_DIR)/$*.d.o $(CPPFLAGS) $(DEBUG_CPPFLAGS) -o $@ $(CURDIR)/$<
+        $(CC) -c -MMD -MF $(OBJ_DIR)/$*.d.d -MT $(OBJ_DIR)/$*.d.o $(CCPFLAGS) $(DEBUG_CCPFLAGS) -o $@ $(CURDIR)/$<
         @cp $(OBJ_DIR)/$*.d.d $(OBJ_DIR)/$*.d.P; \
                 sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
                 -e '/^$$/ d' -e 's/$$/ :/' < $(OBJ_DIR)/$*.d.d >> $(OBJ_DIR)/$*.d.P; \
