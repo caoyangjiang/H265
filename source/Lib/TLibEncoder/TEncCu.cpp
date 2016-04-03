@@ -1000,6 +1000,8 @@ Void TEncCu::xCompressCU(TComDataCU*& rpcBestCU,
                           ? sps.getLog2MinCodingBlockSize()
                           : uiControlledDepth;
 
+//JCY: if this line is on, Qp early termination is ignored.
+uiControlledDepth = sps.getLog2MinCodingBlockSize();
   const Bool bSubBranch =
       bBoundary ||
       !(m_pcEncCfg->getUseEarlyCU() &&

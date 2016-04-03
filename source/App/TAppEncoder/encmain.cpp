@@ -48,6 +48,9 @@
 // ====================================================================================================================
 // Main function
 // ====================================================================================================================
+extern Double dTotalIntMeTime; //JCY
+extern Int iSkippedSearch; //JCY
+extern Int iSearchCnt; //JCY
 
 int main(int argc, char* argv[])
 {
@@ -104,7 +107,11 @@ int main(int argc, char* argv[])
   // ending time
   dResult = (Double)(clock()-lBefore) / CLOCKS_PER_SEC;
   printf("\n Total Time: %12.3f sec.\n", dResult);
+  printf("\n Total Integer ME: %12.3f sec.\n", dTotalIntMeTime);
 
+  //Skip rate
+  double skiprate = (double)iSkippedSearch/iSearchCnt;
+  printf("\n Skip rate: %0.5f\n", skiprate);
   // destroy application encoder class
   cTAppEncTop.destroy();
 

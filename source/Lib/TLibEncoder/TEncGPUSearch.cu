@@ -4,7 +4,7 @@
 #include <math.h>
 #include <thrust/count.h>
 #include <thrust/device_vector.h>
-
+ 
 //From TComRom.h 
 #define     MAX_CU_DEPTH             6                          // log2(CTUSize)
 #define     MAX_CU_SIZE             (1<<(MAX_CU_DEPTH))  
@@ -328,8 +328,8 @@ namespace GPU
 	{
 
 //#define RedFactor 2
-#define RedFactorH 4
-#define RedFactorV 4	
+#define RedFactorH 1
+#define RedFactorV 1	
 #define WLINC 1 //(WLINC < 4)
  		
 		__global__ void gpuGpuFullBlockSearchKernel(Int iPUWidth, 
