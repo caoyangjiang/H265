@@ -52,21 +52,27 @@ extern Double dTotalIntMeTime; //JCY
 extern Int iSkippedSearch; //JCY
 extern Int iSearchCnt; //JCY
 
+extern Int iPUTypeCount[16][16];
+extern Int iPUUseKernelCount[16][16];
 int main(int argc, char* argv[])
 {
-  TAppEncTop  cTAppEncTop;
+  TAppEncTop cTAppEncTop;
 
   // print information
-  fprintf( stdout, "\n" );
+  fprintf(stdout, "\n");
 #if NH_MV
-  fprintf( stdout, "3D-HTM Software: Encoder Version [%s] based on HM Version [%s]", NV_VERSION, HM_VERSION );  
+  fprintf(stdout,
+          "3D-HTM Software: Encoder Version [%s] based on HM Version [%s]",
+          NV_VERSION,
+          HM_VERSION);
 #else
-  fprintf( stdout, "HM software: Encoder Version [%s] (including RExt)", NV_VERSION );
+  fprintf(
+      stdout, "HM software: Encoder Version [%s] (including RExt)", NV_VERSION);
 #endif
-  fprintf( stdout, NVM_ONOS );
-  fprintf( stdout, NVM_COMPILEDBY );
-  fprintf( stdout, NVM_BITS );
-  fprintf( stdout, "\n\n" );
+  fprintf(stdout, NVM_ONOS);
+  fprintf(stdout, NVM_COMPILEDBY);
+  fprintf(stdout, NVM_BITS);
+  fprintf(stdout, "\n\n");
 
   // create application encoder class
   cTAppEncTop.create();
@@ -74,7 +80,7 @@ int main(int argc, char* argv[])
   // parse configuration
   try
   {
-    if(!cTAppEncTop.parseCfg( argc, argv ))
+    if (!cTAppEncTop.parseCfg(argc, argv))
     {
       cTAppEncTop.destroy();
 #if ENVIRONMENT_VARIABLE_DEBUG_AND_TEST
@@ -83,9 +89,10 @@ int main(int argc, char* argv[])
       return 1;
     }
   }
-  catch (df::program_options_lite::ParseFailure &e)
+  catch (df::program_options_lite::ParseFailure& e)
   {
-    std::cerr << "Error parsing option \""<< e.arg <<"\" with argument \""<< e.val <<"\"." << std::endl;
+    std::cerr << "Error parsing option \"" << e.arg << "\" with argument \""
+              << e.val << "\"." << std::endl;
     return 1;
   }
 
@@ -105,9 +112,34 @@ int main(int argc, char* argv[])
   cTAppEncTop.encode();
 
   // ending time
-  dResult = (Double)(clock()-lBefore) / CLOCKS_PER_SEC;
+  dResult = (Double)(clock() - lBefore) / CLOCKS_PER_SEC;
   printf("\n Total Time: %12.3f sec.\n", dResult);
   printf("\n Total Integer ME: %12.3f sec.\n", dTotalIntMeTime);
+
+  for (int i = 0; i < 16; i++)
+  {
+    int iPUWidth = (i + 1) * 4;
+    for (int j = 0; j < 16; j++)
+    {
+      int iPUHeight = (j + 1) * 4;
+
+      if ((iPUHeight == 4) || (iPUHeight == 8) || (iPUHeight == 12) ||
+          (iPUHeight == 16) || (iPUHeight == 24) || (iPUHeight == 32) ||
+          (iPUHeight == 64))
+      {
+        if ((iPUWidth == 4) || (iPUWidth == 8) || (iPUWidth == 12) ||
+            (iPUWidth == 16) || (iPUWidth == 24) || (iPUWidth == 32) ||
+            (iPUWidth == 64))
+        {
+          printf("%dx%d count  %u\n", iPUWidth, iPUHeight, iPUTypeCount[i][j]);
+          printf("%dx%d enter kernel %u\n",
+                 iPUWidth,
+                 iPUHeight,
+                 iPUUseKernelCount[i][j]);
+        }
+      }
+    }
+  }
 
   //Skip rate
   double skiprate = (double)iSkippedSearch/iSearchCnt;

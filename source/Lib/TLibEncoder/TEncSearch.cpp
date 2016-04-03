@@ -46,11 +46,15 @@
 #include <math.h>
 #include <limits>
 
+Int iPUTypeCount[16][16];
+Int iPUUseKernelCount[16][16];
+Double dTotalIntMeTime = 0;  // JCY
+
 //! \ingroup TLibEncoder
 //! \{
-Double dTotalIntMeTime               = 0;  // JCY
 Int    iSkippedSearch = 0;
 Int    iSearchCnt = 0;
+
 static const TComMv s_acMvRefineH[9] = {
     TComMv(0, 0),    // 0
     TComMv(0, -1),   // 1
@@ -347,16 +351,16 @@ Void TEncSearch::init(TEncCfg* pcEncCfg,
   const Bool bFirstSearchDiamond =                                               \
       1; /* 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch */            \
   const Bool bFirstSearchStop =                                                  \
-      0; /*m_pcEncCfg->getFastMEAssumingSmootherMVEnabled();            */       \
+      m_pcEncCfg->getFastMEAssumingSmootherMVEnabled();                          \
   const UInt uiFirstSearchRounds =                                               \
-      2; /* first search stop X rounds after best match (must be >=1) */         \
+      3; /* first search stop X rounds after best match (must be >=1) */         \
   const Bool bEnableRasterSearch = 1;                                            \
   const Bool bAlwaysRasterSearch =                                               \
-      1; /* ===== 1: BETTER but factor 2 slower ===== */                         \
+      0; /* ===== 1: BETTER but factor 2 slower ===== */                         \
   const Bool bRasterRefinementEnable =                                           \
-      1; /* enable either raster refinement or star refinement */                \
+      0; /* enable either raster refinement or star refinement */                \
   const Bool bRasterRefinementDiamond =                                          \
-      1; /* 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch */            \
+      0; /* 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch */            \
   const Bool bStarRefinementEnable =                                             \
       1; /* enable either star refinement or raster refinement */                \
   const Bool bStarRefinementDiamond =                                            \
@@ -364,6 +368,13 @@ Void TEncSearch::init(TEncCfg* pcEncCfg,
   const Bool bStarRefinementStop = 0;                                            \
   const UInt uiStarRefinementRounds =                                            \
       2; /* star refinement stop X rounds after best match (must be >=1) */
+
+  //const Bool bFirstSearchStop = 0;                                                  
+  //const UInt uiFirstSearchRounds = 2;                                               
+  //const Bool bEnableRasterSearch = 1;                                            
+  //const Bool bAlwaysRasterSearch = 1;                                             
+  //const Bool bRasterRefinementEnable = 1;                                           
+  //const Bool bRasterRefinementDiamond = 1; 
 
 #define SEL_SEARCH_CONFIGURATION                                            \
   const Bool bTestOtherPredictedMV = 1;                                     \
@@ -4803,6 +4814,7 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
                            m_pcRdCost->getCost(),
                            m_pcRdCost->getCostScale());
     // printf("%d %d\n",iRoiWidth,iRoiHeight);
+    // clock_t lBefore = clock();
     clock_t lBefore = clock();
     switch (m_iFastSearch)
     {
@@ -4829,6 +4841,7 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
                             ruiCost);
         break;
     }
+
     dTotalIntMeTime += (Double)(clock() - lBefore) / CLOCKS_PER_SEC;
   }
   else
@@ -5026,11 +5039,16 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU* pcCU,
   ruiSAD =
       cStruct.uiBestSad - m_pcRdCost->getCost(cStruct.iBestX, cStruct.iBestY);
 
+  iPUTypeCount[m_pcHostGPU->GetPUWidth() / 4 -
+               1][m_pcHostGPU->GetPUHeight() / 4 - 1]++;
   //-------------------------------------------------------------------------------------------------------//
   if ((bEnableRasterSearch && ((Int)(cStruct.uiBestDistance) > iRaster)))
   {
     // if(iRaster <=4)
     //  iRaster +=1;
+    iPUUseKernelCount[m_pcHostGPU->GetPUWidth() / 4 -
+                      1][m_pcHostGPU->GetPUHeight() / 4 - 1]++;
+
     if (m_pcHostGPU->GetPUWidth() > 4 && m_pcHostGPU->GetPUHeight() > 4)
     {
       m_pcHostGPU->SetSearchWindowSize(pcMvSrchRngLT->getHor(),
