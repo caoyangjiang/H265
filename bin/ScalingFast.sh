@@ -2,11 +2,13 @@
 
 exe=./TAppEncoderStatic
 headfile=SFResult
-testname=AllQP
+testname=InitTest
 cfgprefix=ScalingFast
 prefix="$headfile"/"$testname"
-declare -a Videos=("Balloons" "PoznanStreet" "PoznanHall2" "Kendo" "Dancer" "GTFly" "Newspaper" "Shark")
-declare -a QPs=("22" "27" "32" "37")
+#declare -a Videos=("Balloons" "PoznanStreet" "PoznanHall2" "Kendo" "Dancer" "GTFly" "Newspaper" "Shark")
+declare -a Videos=("Newspaper" "Shark")
+#declare -a QPs=("22" "27" "32" "37")
+declare -a QPs=("37")
 
 #Create directory for output result
 if [ ! -d "$headfile" ]; then

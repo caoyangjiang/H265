@@ -328,8 +328,8 @@ namespace GPU
 	{
 
 //#define RedFactor 2
-#define RedFactorH 1
-#define RedFactorV 1	
+#define RedFactorH 4
+#define RedFactorV 4	
 #define WLINC 1 //(WLINC < 4)
  		
 		__global__ void gpuGpuFullBlockSearchKernel(Int iPUWidth, 
