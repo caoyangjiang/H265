@@ -48,9 +48,9 @@
 // ====================================================================================================================
 // Main function
 // ====================================================================================================================
-extern Double dTotalIntMeTime; //JCY
-extern Int iSkippedSearch; //JCY
-extern Int iSearchCnt; //JCY
+extern Double dTotalIntMeTime;  // JCY
+extern Int iSkippedSearch;  // JCY
+extern Int iSearchCnt;  // JCY
 
 extern Int iPUTypeCount[16][16];
 extern Int iPUUseKernelCount[16][16];
@@ -116,33 +116,34 @@ int main(int argc, char* argv[])
   printf("\n Total Time: %12.3f sec.\n", dResult);
   printf("\n Total Integer ME: %12.3f sec.\n", dTotalIntMeTime);
 
-  for (int i = 0; i < 16; i++)
-  {
-    int iPUWidth = (i + 1) * 4;
-    for (int j = 0; j < 16; j++)
-    {
-      int iPUHeight = (j + 1) * 4;
+  // for (int i = 0; i < 16; i++)
+  // {
+  //   int iPUWidth = (i + 1) * 4;
+  //   for (int j = 0; j < 16; j++)
+  //   {
+  //     int iPUHeight = (j + 1) * 4;
 
-      if ((iPUHeight == 4) || (iPUHeight == 8) || (iPUHeight == 12) ||
-          (iPUHeight == 16) || (iPUHeight == 24) || (iPUHeight == 32) ||
-          (iPUHeight == 64))
-      {
-        if ((iPUWidth == 4) || (iPUWidth == 8) || (iPUWidth == 12) ||
-            (iPUWidth == 16) || (iPUWidth == 24) || (iPUWidth == 32) ||
-            (iPUWidth == 64))
-        {
-          printf("%dx%d count  %u\n", iPUWidth, iPUHeight, iPUTypeCount[i][j]);
-          printf("%dx%d enter kernel %u\n",
-                 iPUWidth,
-                 iPUHeight,
-                 iPUUseKernelCount[i][j]);
-        }
-      }
-    }
-  }
+  //     if ((iPUHeight == 4) || (iPUHeight == 8) || (iPUHeight == 12) ||
+  //         (iPUHeight == 16) || (iPUHeight == 24) || (iPUHeight == 32) ||
+  //         (iPUHeight == 64))
+  //     {
+  //       if ((iPUWidth == 4) || (iPUWidth == 8) || (iPUWidth == 12) ||
+  //           (iPUWidth == 16) || (iPUWidth == 24) || (iPUWidth == 32) ||
+  //           (iPUWidth == 64))
+  //       {
+  //         printf("%dx%d count  %u\n", iPUWidth, iPUHeight,
+  //         iPUTypeCount[i][j]);
+  //         printf("%dx%d enter kernel %u\n",
+  //                iPUWidth,
+  //                iPUHeight,
+  //                iPUUseKernelCount[i][j]);
+  //       }
+  //     }
+  //   }
+  // }
 
-  //Skip rate
-  double skiprate = (double)iSkippedSearch/iSearchCnt;
+  // Skip rate
+  double skiprate = (double)iSkippedSearch / iSearchCnt;
   printf("\n Skip rate: %0.5f\n", skiprate);
   // destroy application encoder class
   cTAppEncTop.destroy();
