@@ -2,7 +2,7 @@
 
 exe=./TAppEncoderStatic
 headfile=SFResult
-testname=SkipGPU
+testname=Skip8GPU
 cfgprefix=ScalingFast
 prefix="$headfile"/"$testname"
 #declare -a Videos=("Balloons" "PoznanStreet" "PoznanHall2" "Kendo" "Dancer" "GTFly" "Newspaper" "Shark")

@@ -4830,7 +4830,12 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
                          ruiCost);
         break;
       case 4:
-        rcMv = *pcMvPred;
+        rcMv                              = *pcMvPred;
+        const TComMv* pIntegerMv2Nx2NPred = 0;
+        if (pcCU->getPartitionSize(0) != SIZE_2Nx2N || pcCU->getDepth(0) != 0)
+        {
+          pIntegerMv2Nx2NPred = &(m_integerMv2Nx2N[eRefPicList][iRefIdxPred]);
+        }
 
         xGpuFullBlockSearch(pcCU,
                             pcPatternKey,
@@ -4839,8 +4844,12 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
                             &cMvSrchRngLT,
                             &cMvSrchRngRB,
                             rcMv,
-                            ruiCost);
-
+                            ruiCost,
+                            pIntegerMv2Nx2NPred);
+        if (pcCU->getPartitionSize(0) == SIZE_2Nx2N)
+        {
+          m_integerMv2Nx2N[eRefPicList][iRefIdxPred] = rcMv;
+        }
         break;
     }
 
@@ -4949,7 +4958,8 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU* pcCU,
                                      TComMv* pcMvSrchRngLT,
                                      TComMv* pcMvSrchRngRB,
                                      TComMv& rcMv,
-                                     Distortion& ruiSAD)
+                                     Distortion& ruiSAD,
+                                     const TComMv* pIntegerMv2Nx2NPred)
 {
   const Bool bTestOtherPredictedMV  = 1;
   const Bool bTestZeroVector        = 1;
@@ -5047,7 +5057,7 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU* pcCU,
     iPUUseKernelCount[m_pcHostGPU->GetPUWidth() / 4 -
                       1][m_pcHostGPU->GetPUHeight() / 4 - 1]++;
 
-    if (m_pcHostGPU->GetPUWidth() > 4 && m_pcHostGPU->GetPUHeight() > 4)
+    if (m_pcHostGPU->GetPUWidth() > 8 && m_pcHostGPU->GetPUHeight() > 8)
     {
       m_pcHostGPU->SetSearchWindowSize(pcMvSrchRngLT->getHor(),
                                        pcMvSrchRngRB->getHor(),
@@ -5064,6 +5074,32 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU* pcCU,
     }
     else
     {
+      if (pIntegerMv2Nx2NPred != 0)
+      {
+        TComMv integerMv2Nx2NPred = *pIntegerMv2Nx2NPred;
+        integerMv2Nx2NPred <<= 2;
+        pcCU->clipMv(integerMv2Nx2NPred);
+        integerMv2Nx2NPred >>= 2;
+        xTZSearchHelp(pcPatternKey,
+                      cStruct,
+                      integerMv2Nx2NPred.getHor(),
+                      integerMv2Nx2NPred.getVer(),
+                      0,
+                      0);
+
+        // reset search range
+        TComMv cMvSrchRngLT;
+        TComMv cMvSrchRngRB;
+        Int iSrchRng = m_iSearchRange;
+        TComMv currBestMv(cStruct.iBestX, cStruct.iBestY);
+        currBestMv <<= 2;
+        xSetSearchRange(pcCU, currBestMv, iSrchRng, cMvSrchRngLT, cMvSrchRngRB);
+        iSrchRngHorLeft   = cMvSrchRngLT.getHor();
+        iSrchRngHorRight  = cMvSrchRngRB.getHor();
+        iSrchRngVerTop    = cMvSrchRngLT.getVer();
+        iSrchRngVerBottom = cMvSrchRngRB.getVer();
+      }
+
       if (cStruct.uiBestDistance == 1)
       {
         cStruct.uiBestDistance = 0;
@@ -5239,23 +5275,15 @@ Void TEncSearch::xPatternSearchFast(TComDataCU* pcCU,
   switch (m_iFastSearch)
   {
     case 1:
-      xGpuFullBlockSearch(pcCU,
-                          pcPatternKey,
-                          piRefY,
-                          iRefStride,
-                          pcMvSrchRngLT,
-                          pcMvSrchRngRB,
-                          rcMv,
-                          ruiSAD);
-      // xTZSearch(pcCU,
-      //           pcPatternKey,
-      //           piRefY,
-      //           iRefStride,
-      //           pcMvSrchRngLT,
-      //           pcMvSrchRngRB,
-      //           rcMv,
-      //           ruiSAD,
-      //           pIntegerMv2Nx2NPred);
+      xTZSearch(pcCU,
+                pcPatternKey,
+                piRefY,
+                iRefStride,
+                pcMvSrchRngLT,
+                pcMvSrchRngRB,
+                rcMv,
+                ruiSAD,
+                pIntegerMv2Nx2NPred);
       break;
 
     case 2:
