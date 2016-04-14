@@ -52,8 +52,8 @@ Double dTotalIntMeTime = 0;  // JCY
 
 //! \ingroup TLibEncoder
 //! \{
-Int    iSkippedSearch = 0;
-Int    iSearchCnt = 0;
+Int iSkippedSearch = 0;
+Int iSearchCnt     = 0;
 
 static const TComMv s_acMvRefineH[9] = {
     TComMv(0, 0),    // 0
@@ -369,12 +369,12 @@ Void TEncSearch::init(TEncCfg* pcEncCfg,
   const UInt uiStarRefinementRounds =                                            \
       2; /* star refinement stop X rounds after best match (must be >=1) */
 
-  //const Bool bFirstSearchStop = 0;                                                  
-  //const UInt uiFirstSearchRounds = 2;                                               
-  //const Bool bEnableRasterSearch = 1;                                            
-  //const Bool bAlwaysRasterSearch = 1;                                             
-  //const Bool bRasterRefinementEnable = 1;                                           
-  //const Bool bRasterRefinementDiamond = 1; 
+// const Bool bFirstSearchStop = 0;
+// const UInt uiFirstSearchRounds = 2;
+// const Bool bEnableRasterSearch = 1;
+// const Bool bAlwaysRasterSearch = 1;
+// const Bool bRasterRefinementEnable = 1;
+// const Bool bRasterRefinementDiamond = 1;
 
 #define SEL_SEARCH_CONFIGURATION                                            \
   const Bool bTestOtherPredictedMV = 1;                                     \
@@ -4769,6 +4769,7 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
   m_pcRdCost->setCostScale(2);
 
   setWpScalingDistParam(pcCU, iRefIdxPred, eRefPicList);
+
   //  Do integer search
   if (!m_iFastSearch || bBi)
   {
@@ -4814,13 +4815,11 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
                            m_pcRdCost->getCost(),
                            m_pcRdCost->getCostScale());
     // printf("%d %d\n",iRoiWidth,iRoiHeight);
-    // clock_t lBefore = clock();
     clock_t lBefore = clock();
     switch (m_iFastSearch)
     {
-      rcMv = *pcMvPred;
-
       case 3:
+        rcMv = *pcMvPred;
         xBlockFastSearch(pcCU,
                          pcPatternKey,
                          piRefY,
@@ -4831,6 +4830,8 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
                          ruiCost);
         break;
       case 4:
+        rcMv = *pcMvPred;
+
         xGpuFullBlockSearch(pcCU,
                             pcPatternKey,
                             piRefY,
@@ -4839,6 +4840,7 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
                             &cMvSrchRngRB,
                             rcMv,
                             ruiCost);
+
         break;
     }
 
@@ -4846,7 +4848,8 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
   }
   else
   {
-    rcMv = *pcMvPred;
+    clock_t lBefore = clock();
+    rcMv            = *pcMvPred;
     // printf("%d %d\n",iRoiWidth,iRoiHeight);
 
     const TComMv* pIntegerMv2Nx2NPred = 0;
@@ -4855,7 +4858,6 @@ Void TEncSearch::xMotionEstimation(TComDataCU* pcCU,
       pIntegerMv2Nx2NPred = &(m_integerMv2Nx2N[eRefPicList][iRefIdxPred]);
     }
 
-    clock_t lBefore = clock();
     xPatternSearchFast(pcCU,
                        pcPatternKey,
                        piRefY,
@@ -4949,21 +4951,17 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU* pcCU,
                                      TComMv& rcMv,
                                      Distortion& ruiSAD)
 {
-  const Bool bTestOtherPredictedMV = 1;
-  const Bool bTestZeroVector       = 1;
-  const Bool bFirstSearchStop      = 0;
-  const UInt uiFirstSearchRounds   = 3;
-  const Bool bEnableRasterSearch   = 1;
-  static Int iRaster               = 3;
-
-  const Bool bStarRefinementEnable = 1;
-  const Bool bAlwaysRasterSearch   = 0;
-  /*0*/ /* ===== 1: BETTER but factor 2 slower ===== */
+  const Bool bTestOtherPredictedMV  = 1;
+  const Bool bTestZeroVector        = 1;
+  const Bool bFirstSearchStop       = 1;
+  const UInt uiFirstSearchRounds    = 3;
+  const Bool bEnableRasterSearch    = 1;
+  static Int iRaster                = 3;
+  const Bool bStarRefinementEnable  = 1;
+  const Bool bAlwaysRasterSearch    = 0;
   const Bool bStarRefinementDiamond = 1;
-  /*1*/ /* 1 = xTZ8PointDiamondSearch   0 = xTZ8PointSquareSearch */
-  const Bool bStarRefinementStop    = 0; /*0*/
+  const Bool bStarRefinementStop    = 0;
   const UInt uiStarRefinementRounds = 2;
-  /*2*/ /* star refinement stop X rounds after best match (must be >=1) */
 
   iSearchCnt++;
 
@@ -5149,7 +5147,7 @@ Void TEncSearch::xGpuFullBlockSearch(TComDataCU* pcCU,
   }
   else
   {
-	iSkippedSearch++;
+    iSkippedSearch++;
     // if (iRaster >=2)
     //   iRaster -=1;
   }
@@ -5241,15 +5239,23 @@ Void TEncSearch::xPatternSearchFast(TComDataCU* pcCU,
   switch (m_iFastSearch)
   {
     case 1:
-      xTZSearch(pcCU,
-                pcPatternKey,
-                piRefY,
-                iRefStride,
-                pcMvSrchRngLT,
-                pcMvSrchRngRB,
-                rcMv,
-                ruiSAD,
-                pIntegerMv2Nx2NPred);
+      xGpuFullBlockSearch(pcCU,
+                          pcPatternKey,
+                          piRefY,
+                          iRefStride,
+                          pcMvSrchRngLT,
+                          pcMvSrchRngRB,
+                          rcMv,
+                          ruiSAD);
+      // xTZSearch(pcCU,
+      //           pcPatternKey,
+      //           piRefY,
+      //           iRefStride,
+      //           pcMvSrchRngLT,
+      //           pcMvSrchRngRB,
+      //           rcMv,
+      //           ruiSAD,
+      //           pIntegerMv2Nx2NPred);
       break;
 
     case 2:
@@ -5316,31 +5322,31 @@ Void TEncSearch::xTZSearch(TComDataCU* pcCU,
     xTZSearchHelp(pcPatternKey, cStruct, 0, 0, 0, 0);
   }
 
-  if (pIntegerMv2Nx2NPred != 0)
-  {
-    TComMv integerMv2Nx2NPred = *pIntegerMv2Nx2NPred;
-    integerMv2Nx2NPred <<= 2;
-    pcCU->clipMv(integerMv2Nx2NPred);
-    integerMv2Nx2NPred >>= 2;
-    xTZSearchHelp(pcPatternKey,
-                  cStruct,
-                  integerMv2Nx2NPred.getHor(),
-                  integerMv2Nx2NPred.getVer(),
-                  0,
-                  0);
+  // if (pIntegerMv2Nx2NPred != 0)
+  // {
+  //   TComMv integerMv2Nx2NPred = *pIntegerMv2Nx2NPred;
+  //   integerMv2Nx2NPred <<= 2;
+  //   pcCU->clipMv(integerMv2Nx2NPred);
+  //   integerMv2Nx2NPred >>= 2;
+  //   xTZSearchHelp(pcPatternKey,
+  //                 cStruct,
+  //                 integerMv2Nx2NPred.getHor(),
+  //                 integerMv2Nx2NPred.getVer(),
+  //                 0,
+  //                 0);
 
-    // reset search range
-    TComMv cMvSrchRngLT;
-    TComMv cMvSrchRngRB;
-    Int iSrchRng = m_iSearchRange;
-    TComMv currBestMv(cStruct.iBestX, cStruct.iBestY);
-    currBestMv <<= 2;
-    xSetSearchRange(pcCU, currBestMv, iSrchRng, cMvSrchRngLT, cMvSrchRngRB);
-    iSrchRngHorLeft   = cMvSrchRngLT.getHor();
-    iSrchRngHorRight  = cMvSrchRngRB.getHor();
-    iSrchRngVerTop    = cMvSrchRngLT.getVer();
-    iSrchRngVerBottom = cMvSrchRngRB.getVer();
-  }
+  //   // reset search range
+  //   TComMv cMvSrchRngLT;
+  //   TComMv cMvSrchRngRB;
+  //   Int iSrchRng = m_iSearchRange;
+  //   TComMv currBestMv(cStruct.iBestX, cStruct.iBestY);
+  //   currBestMv <<= 2;
+  //   xSetSearchRange(pcCU, currBestMv, iSrchRng, cMvSrchRngLT, cMvSrchRngRB);
+  //   iSrchRngHorLeft   = cMvSrchRngLT.getHor();
+  //   iSrchRngHorRight  = cMvSrchRngRB.getHor();
+  //   iSrchRngVerTop    = cMvSrchRngLT.getVer();
+  //   iSrchRngVerBottom = cMvSrchRngRB.getVer();
+  // }
 
   // start search
   Int iDist   = 0;
@@ -5533,6 +5539,7 @@ Void TEncSearch::xTZSearchSelective(TComDataCU* pcCU,
                                     Distortion& ruiSAD,
                                     const TComMv* pIntegerMv2Nx2NPred)
 {
+  printf("Selective\n");
   SEL_SEARCH_CONFIGURATION
 
   Int iSrchRngHorLeft        = pcMvSrchRngLT->getHor();

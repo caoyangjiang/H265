@@ -51,7 +51,7 @@ endif
 #CPPFLAGS          = -Wall -fPIC $(DEFS) -I$(CURDIR)/$(INC_DIR) $(USER_INC_DIRS)
 CPPFLAGS          = -fPIC $(DEFS)  $(ADDDEFS) -I$(CURDIR)/$(INC_DIR) $(USER_INC_DIRS) -std=c++11 -Wall -Wshadow -Wno-sign-compare -Werror
 CCFLAGS          =  -static-libgcc -fPIC $(DEFS) -I$(CURDIR)/$(INC_DIR) $(USER_INC_DIRS) -Wall -Wshadow -Wno-sign-compare -Werror
-NVCCFLAGS         = -I$(INC_DIR) -I$(INC_LIB) --compiler-options=-Wall -c -arch=compute_20 -code=sm_20 -Xptxas -dlcm=ca
+NVCCFLAGS         = -I$(INC_DIR) -I$(INC_LIB) --compiler-options=-Wall -c -arch=compute_52 -code=sm_52 -Xptxas -dlcm=ca
 ########## 
 # enforce 32-bit build : 1=yes, 0=no
 ##########
