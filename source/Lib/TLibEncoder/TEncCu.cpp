@@ -991,6 +991,14 @@ Void TEncCu::xCompressCU(TComDataCU*& rpcBestCU,
   }
   */
 
+   uiControlledDepth = DepthLUT[iMaxQP];
+  //uiControlledDepth = 0;
+  if ((abs(rpcBestCU->getCUMvField(REF_PIC_LIST_0)->getMv(0).getHor()) > 3) ||
+      (abs(rpcBestCU->getCUMvField(REF_PIC_LIST_0)->getMv(0).getVer()) > 3) ||
+      (abs(rpcBestCU->getCUMvField(REF_PIC_LIST_1)->getMv(0).getHor()) > 3) ||
+      (abs(rpcBestCU->getCUMvField(REF_PIC_LIST_1)->getMv(0).getVer()) > 3))
+    uiControlledDepth += 1;
+
   uiControlledDepth = uiControlledDepth > sps.getLog2MinCodingBlockSize()
                           ? sps.getLog2MinCodingBlockSize()
                           : uiControlledDepth;
@@ -1000,8 +1008,8 @@ Void TEncCu::xCompressCU(TComDataCU*& rpcBestCU,
                           ? sps.getLog2MinCodingBlockSize()
                           : uiControlledDepth;
 
-//JCY: if this line is on, Qp early termination is ignored.
-uiControlledDepth = sps.getLog2MinCodingBlockSize();
+  // JCY: if this line is on, Qp early termination is ignored.
+  // uiControlledDepth = sps.getLog2MinCodingBlockSize();
   const Bool bSubBranch =
       bBoundary ||
       !(m_pcEncCfg->getUseEarlyCU() &&
